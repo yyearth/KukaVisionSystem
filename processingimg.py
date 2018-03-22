@@ -6,12 +6,16 @@
 import numpy as np
 import cv2
 
+'''
+
+'''
+
+
 def processing(img):
-    err = tuple()
+    err = (0, 0)
 
     return err
 
 
 if __name__ == '__main__':
     pass
-
