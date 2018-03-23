@@ -7,7 +7,7 @@ import cv2
 import threading
 from queue import Queue
 from clientforkuka import client
-from processingimg import processing
+from processingimg import ColorTracker
 
 '''
 main application
@@ -19,7 +19,6 @@ img
 data_q = Queue(maxsize=1)
 pos_q = Queue(maxsize=1)
 
-cap = cv2.VideoCapture(0)
 # err.put()
 
 
@@ -27,13 +26,31 @@ class ProcessThread(threading.Thread):
 
     def __init__(self):
         super().__init__()
+        self.frame = None
+        self.cap = cv2.VideoCapture(0)
 
     def run(self):
+        ct = ColorTracker()
+        cv2.namedWindow('img')
+        cv2.setMouseCallback('img', self.mouseInteraction, param=ct)
         while True:
-            ret, frame = cap.read()
-            if not ret: continue
-            # err = processing(frame)
+            ret, self.frame = self.cap.read()
+            if not ret:
+                continue
+            print(ct.track(self.frame))
+            cv2.imshow('img', self.frame)
+            if cv2.waitKey(1) == 27:
+                break
             # TODO
+        cv2.destroyAllWindows()
+        self.cap.release()
+
+    def mouseInteraction(self, event, x, y, flags, ct):
+
+        # print(x,y)
+        if event == cv2.EVENT_LBUTTONUP:
+            bgr = self.frame[y, x]
+            ct.setColor(bgr)
 
 
 class SocketThread(threading.Thread):
@@ -49,4 +66,4 @@ class SocketThread(threading.Thread):
 
 
 if __name__ == '__main__':
-    pass
+    ProcessThread().start()

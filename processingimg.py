@@ -21,13 +21,14 @@ COLOR_TRACK = 0
 
 class ColorTracker(object):
 
-    def __init__(self, bgr):
+    def __init__(self, bgr=None):
         # super().__init__()
-        self._targetbgr = bgr
         self._sigma = 3
-        hsv = cv2.cvtColor(np.uint8([[bgr]]), cv2.COLOR_BGR2HSV)
-        self._color_l = np.array([cv2.add(hsv[0][0], - self._sigma)[0][0], 100, 100], np.uint8)
-        self._color_u = np.array([cv2.add(hsv[0][0], self._sigma)[0][0], 255, 255], np.uint8)
+        self._targetbgr = bgr
+        self._color_l = [0, 0, 0]
+        self._color_u = [0, 0, 0]
+        if bgr is not None:
+            self.setColor(bgr)
 
     # use @property later
     def setColor(self, bgr):
@@ -38,6 +39,8 @@ class ColorTracker(object):
 
     def track(self, img):
         err_x, err_y = 0, 0
+        if self._targetbgr is None:
+            return err_x, err_y
 
         img2 = cv2.GaussianBlur(img, (21, 21), 1)
         img_hsv = cv2.cvtColor(img2, cv2.COLOR_BGR2HSV)
@@ -48,8 +51,8 @@ class ColorTracker(object):
         # mask = cv2.erode(mask, kernel)
         # mask = cv2.dilate(mask, kernel)
         mask, contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.imshow('img', mask)
-        cv2.waitKey()
+        # cv2.imshow('img', mask)
+        # cv2.waitKey()
         for cnt in contours:
             if cv2.contourArea(cnt) < 500:
                 continue
@@ -64,8 +67,8 @@ class ColorTracker(object):
             err_y = y + h // 2
             cv2.circle(img, (err_x, err_y), 2, (0, 0, 255), -1)
             # print(err_x, err_y)
-        cv2.imshow('img', img)
-        cv2.waitKey()
+        # cv2.imshow('img', img)
+        # cv2.waitKey()
 
         return err_x, err_y
 
