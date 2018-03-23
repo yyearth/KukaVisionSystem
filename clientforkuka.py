@@ -19,10 +19,12 @@ def client(addr, data_q, pos_q):
     while True:
         # if data_q.empty(): continue
         data = data_q.get()
-        # TODO xml wrap
+        # TODO strategy and xml wrap
 
         cli.send(data.encode('ascii'))
+        print('wait recv...')
         rec = cli.recv(1024).decode('ascii')
+        print('got')
         # TODO xml parse
 
         # if pos_q.full()
@@ -38,13 +40,14 @@ if __name__ == '__main__':
     pos_q = Queue(maxsize=1)
 
     threading.Thread(target=client, args=(('localhost', 9000), data_q, pos_q)).start()
-    print('main thread')
+
+    time.sleep(2)
     data_q.put('num:1')
-    time.sleep(1)
-    print('main thread:', pos_q.get())
+    # time.sleep(1)
+    print('main thread get:', pos_q.get())
     time.sleep(1)
     data_q.put('num:2')
-    print('main thread:', pos_q.get())
+    print('main thread get:', pos_q.get())
 
 
 

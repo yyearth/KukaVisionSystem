@@ -21,8 +21,8 @@ while True:
     while True:
         try:
             data = conn.recv(1024).decode('ascii')
-            time.sleep(0.5)  # kuka moving
-            conn.send(('server sendback '+data).encode('ascii'))
+            time.sleep(2)  # kuka moving
+            conn.send((data+' ser').encode('ascii'))
         except ConnectionResetError as e:
             print(e)
             break

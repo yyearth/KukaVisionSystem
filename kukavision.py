@@ -16,8 +16,8 @@ img
 
 '''
 
-err = Queue(maxsize=1)
-pos = Queue(maxsize=1)
+data_q = Queue(maxsize=1)
+pos_q = Queue(maxsize=1)
 
 cap = cv2.VideoCapture(0)
 # err.put()
@@ -32,7 +32,7 @@ class ProcessThread(threading.Thread):
         while True:
             ret, frame = cap.read()
             if not ret: continue
-            err = processing(frame)
+            # err = processing(frame)
             # TODO
 
 
