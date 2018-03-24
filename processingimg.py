@@ -18,6 +18,51 @@ COLOR_TRACK = 0
 #     def __init__(self):
 #         super().__init__()
 
+class CircleDetector(object):
+
+    def __init__(self):
+        pass
+
+    def detect(self, img, mindist=3, threshold=50, minr=None, maxr=None):
+        lr = []
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        gray = cv2.GaussianBlur(gray, (21, 21), 1)
+        circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, dp=1,
+                                   minDist=mindist, param1=100, param2=threshold)
+        if circles is None:
+            return 0, 0
+        circles = circles[0]
+        for x, y, r in circles:
+            lr.append(r)
+        max_index = lr.index(max(lr))
+        circles = np.delete(circles, max_index, axis=0)
+        del lr[max_index]
+        max_index = lr.index(max(lr))
+        # max_x, max_y, max_r = circles[max_index]
+
+        cir = []
+
+        for i in range(len(circles)):
+            a = np.linalg.norm(circles[max_index] - circles[i])
+            if a < 8:
+                cir.append(circles[i].tolist())
+
+            # print(a)
+        cir = np.array(cir)
+        mean_cir = list(np.around(np.mean(cir, 0)).astype('uint16'))
+        # print(cir)
+        cir = cir.astype('uint16').tolist()
+        # print(mean_cir)
+        # print(cir)
+
+        # img = cv2.imread('cir2.png')
+        for x, y, r in cir:
+            cv2.circle(img, (x, y), r, (0, 255, 0), 1)
+
+        cv2.circle(img, (mean_cir[0], mean_cir[1]), 2, (0, 0, 255), -1)
+
+        return mean_cir[0], mean_cir[1]
+
 
 class ColorTracker(object):
 
@@ -59,6 +104,7 @@ class ColorTracker(object):
             # print(cv2.contourArea(cnt))
             x, y, w, h = cv2.boundingRect(cnt)
             cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 1)
+
         if len(contours) > 0:
             cnt_max = max(contours, key=cv2.contourArea)
             x, y, w, h = cv2.boundingRect(cnt_max)
@@ -83,12 +129,18 @@ def processing(img, mode):
 
 
 if __name__ == '__main__':
-    img = cv2.imread('photo0.jpg')
+    # img = cv2.imread('photo0.jpg')
+    img = cv2.imread('cir2.png')
     # trackcolor(img, [225, 114, 76])
-    ct = ColorTracker([225, 114, 76])
-    ex, ey = ct.track(img)
-    print(ex, ey)
-    ct.setColor([52, 207, 253])
-    ex, ey = ct.track(img)
-    print(ex, ey)
+    # ct = ColorTracker([225, 114, 76])
+    # ex, ey = ct.track(img)
+    # print(ex, ey)
+    # ct.setColor([52, 207, 253])
+    # ex, ey = ct.track(img)
+    # print(ex, ey)
+    cd = CircleDetector()
+    x, y = cd.detect(img)
 
+    print(x, y)
+    cv2.imshow('img', img)
+    cv2.waitKey()
