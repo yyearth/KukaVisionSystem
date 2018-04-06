@@ -11,6 +11,8 @@ import cv2
 '''
 
 COLOR_TRACK = 0
+angle_factor_x = 0.0
+angle_factor_y = 0.0
 
 
 # class FaceFinder(object):
@@ -117,6 +119,10 @@ class ColorTracker(object):
         # cv2.waitKey()
 
         return err_x, err_y
+
+
+def angle(ix, iy):
+    return ix * angle_factor_x, iy * angle_factor_y
 
 
 def processing(img, mode):
