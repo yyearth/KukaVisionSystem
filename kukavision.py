@@ -19,7 +19,6 @@ img
 data_q = Queue(maxsize=1)
 pos_q = Queue(maxsize=1)
 
-
 # err.put()
 class Pos:
     def __init__(self, x, y, z, a, b, c):

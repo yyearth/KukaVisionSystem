@@ -3,8 +3,10 @@
 # @Time    : 2018/3/22 9:44
 # @Author  : yy
 
-import socket
+# import socket
 import xml.etree.ElementTree as ET
+
+# from collections import OrderedDict
 
 '''
 TCP socket client
@@ -29,7 +31,9 @@ TCP socket client
 #     return ET.tostring(root).decode('ascii')
 
 
-def framewrapper(x, y, z, a, b, c):
+def framewrappe(x, y, z, a, b, c):
+    # od = OrderedDict(X=str('%.6f' % x), Y=str('%.6f' % y), Z=str('%.6f' % z),
+    #                  A=str('%.6f' % a), B=str('%.6f' % b), C=str('%.6f' % c))
     att = {'X': str('%.6f' % x), 'Y': str('%.6f' % y), 'Z': str('%.6f' % z),
            'A': str('%.6f' % a), 'B': str('%.6f' % b), 'C': str('%.6f' % c)}
     root = ET.Element('Sensor')
@@ -37,7 +41,7 @@ def framewrapper(x, y, z, a, b, c):
     return ET.tostring(root).decode('ascii')
 
 
-def frameparser(sr):
+def frameparse(sr):
     root = ET.fromstring(sr)
     if root is None:
         return None
@@ -84,17 +88,21 @@ if __name__ == '__main__':
     # print('main thread get:', pos_q.get())
 
     import socket
+    from kukavision import Pos
 
-    data1 = '<Move><TX>12.11</TX><TY>2.10</TY><TZ>2.13</TZ><TA>2.13</TA><TB>2.13</TB><TC>2.13</TC></Move>'
-    data2 = '<Move><TX="12.11" TY="0.000000" TZ="0.000000" TA="0.000000" TB="0.000000" TC="0.000000"</Move>'
     cli = socket.socket()
     cli.connect(('172.31.1.147', 54600))
     print('connect to KUKA server')
     while True:
         rec = cli.recv(1024).decode('ascii')
         print(rec)
+        # rec_pos = Pos(*frameparse(rec))
+        # rec.x += 100
+        tu = frameparse(rec)
+        tu[0] = tu[0] + 100
+        cm = framewrappe(*tu)
         # data = input('>>>').encode('ascii')
-        cli.send(data1.encode('ascii'))
+        cli.send(cm)
         # cli.send(rec.encode('ascii'))
         # print(rec)
 # <Robot><frame X="915.000000" Y="0.000000" Z="1120.000000" A="0.000000" B="90.000000" C="0.000000"></frame></Robot>
