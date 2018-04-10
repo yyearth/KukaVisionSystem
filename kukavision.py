@@ -19,7 +19,16 @@ img
 data_q = Queue(maxsize=1)
 pos_q = Queue(maxsize=1)
 
+
 # err.put()
+class Pos:
+    def __init__(self, x, y, z, a, b, c):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.a = a
+        self.b = b
+        self.c = c
 
 
 class ProcessThread(threading.Thread):
