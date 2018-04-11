@@ -8,7 +8,8 @@ import threading
 from queue import Queue
 from clientforkuka import client
 from processingimg import ColorTracker
-
+import socket
+from clientforkuka import framewrappe, frameparse
 '''
 main application
 2 thread: img processing and socket client 
@@ -16,8 +17,8 @@ img
 
 '''
 
-data_q = Queue(maxsize=1)
-pos_q = Queue(maxsize=1)
+target = Queue(maxsize=1)
+position = Queue(maxsize=1)
 
 # err.put()
 class Pos:
@@ -30,7 +31,7 @@ class Pos:
         self.c = c
 
 
-class ProcessThread(threading.Thread):
+class ImageThread(threading.Thread):
 
     def __init__(self):
         super().__init__()
@@ -68,10 +69,20 @@ class SocketThread(threading.Thread):
         self.addr = addr
 
     def run(self):
-        # TODO
-        # client(self.addr, pos,)
-        pass
+        sock = socket.socket()
+        sock.connect(self.addr)
+        print('connect to KUKA server', self.addr)
+        while True:
+            rec = sock.recv(1024).decode('ascii')
+            data = frameparse(rec)
+            print(data)
+            data[0] = data[0] + 100
+            print(data)
+            data = framewrappe(*data).encode('ascii')
+            sock.send(data)
 
 
 if __name__ == '__main__':
-    ProcessThread().start()
+    # ImageThread().start()
+    SocketThread(('172.31.1.147', 54600)).start()
+
