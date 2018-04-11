@@ -90,6 +90,7 @@ if __name__ == '__main__':
     # print('main thread get:', position.get())
 
     import socket
+    import time
     from kukavision import Pos
 
     cli = socket.socket()
@@ -97,12 +98,12 @@ if __name__ == '__main__':
     print('connect to KUKA server')
     while True:
         rec = cli.recv(1024).decode('ascii')
-        tu = frameparse(rec)
-        print(tu)
-        # tu[0] = tu[0] + 100
-        # cm = framewrappe(*tu).encode('ascii')
-        cm = '<Sensor><frame X="551.153503" Y="28.755083" Z="1404.805664" ' \
-             'A="10.193840" B="11.517308" C="-13.239092"/></Sensor>'.encode('ascii')
+        po = frameparse(rec)
+        print(po)
+        po[0] = po[0] + 30
+        cm = framewrappe(*po).encode('ascii')
+        # cm = '<Sensor><frame X="551.153503" Y="28.755083" Z="1404.805664" ' \
+        #      'A="10.193840" B="11.517308" C="-13.239092"/></Sensor>'.encode('ascii')
         cli.send(cm)
         print(cm)
 
